@@ -1,0 +1,159 @@
+Create the following tables, populate the data, and write queries for the questions below:
+
+Tables
+1. Students
+student_id (INT) – primary key
+student_name (VARCHAR(50))
+city (VARCHAR(30))
+2. Courses
+course_id (INT) – primary key
+course_name (VARCHAR(50))
+dept (VARCHAR(30))
+fees (DECIMAL(10,2))
+3. Enrollments
+enrollment_id (INT) – primary key
+student_id (INT) – foreign key references Students(student_id)
+course_id (INT) – foreign key references Courses(course_id)
+enroll_date DATE
+payment_status (VARCHAR(20))
+Additional Restrictions
+fees must be greater than 0
+payment_status can contain only 'Paid' or 'Pending'
+Queries to Write
+
+a) Create the database and the three tables with proper primary key, foreign key and check constraints.
+
+b) Insert the given records into all three tables.
+
+c) Write queries for:
+
+Show all courses where fees > 6000 (sorted descending)
+Display names of students who belong to Delhi
+Show course names whose name contains 'o' at 2nd or 3rd position
+Display enrollment_id, student_name, course_name, enroll_date, payment_status where payment_status = 'Paid'
+Display student name and course name for enrollments done in November or August
+Show number of courses each student enrolled in, along with min and max fees (only students with >1 course)
+Display all courses where no student has enrolled
+
+
+code:
+
+CREATE DATABASE CollegeDB;
+USE CollegeDB;
+
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY,
+    student_name VARCHAR(50),
+    city VARCHAR(30)
+);
+
+
+CREATE TABLE Courses (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50),
+    dept VARCHAR(30),
+    fees DECIMAL(10,2),
+    CHECK (fees > 0)
+);
+
+
+CREATE TABLE Enrollments (
+    enrollment_id INT PRIMARY KEY,
+    student_id INT,
+    course_id INT,
+    enroll_date DATE,
+    payment_status VARCHAR(20),
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id),
+    CHECK (payment_status IN ('Paid', 'Pending'))
+);
+
+INSERT INTO Students VALUES
+(1, 'Ishaan Gupta', 'Delhi'),
+(2, 'Tanya Sharma', 'Jaipur'),
+(3, 'Vikram Pillai', 'Delhi'),
+(4, 'Ananya Reddy', 'Hyderabad'),
+(5, 'Kiran Malhotra', 'Jaipur');
+
+
+INSERT INTO Courses VALUES
+(101, 'Data Science', 'IT', 8500.00),
+(102, 'Cloud Computing', 'IT', 7000.00),
+(103, 'Cyber Security', 'IT', 9000.00),
+(104, 'AI Basics', 'IT', 6000.00);
+
+
+
+INSERT INTO Enrollments VALUES
+(1, 1, 101, '2024-11-10', 'Paid'),
+(2, 2, 102, '2024-08-15', 'Pending'),
+(3, 1, 103, '2024-11-20', 'Paid'),
+(4, 3, 101, '2024-07-01', 'Paid'),
+(5, 4, 104, '2024-08-25', 'Pending'),
+(6, 5, 102, '2024-11-05', 'Paid');
+
+
+Show all courses where fees > 6000 (sorted descending):
+SELECT * FROM Courses
+WHERE fees > 6000
+ORDER BY fees DESC;
+
+
+
+Display names of students who belong to Delhi:
+SELECT student_name
+FROM Students
+WHERE city = 'Delhi';
+
+
+
+Show course names whose name contains 'o' at 2nd or 3rd position:
+SELECT course_name
+FROM Courses
+WHERE course_name LIKE '_o%' OR course_name LIKE '__o%';
+
+
+
+Display enrollment_id, student_name, course_name, enroll_date, payment_status where payment_status = 'Paid':
+SELECT 
+    e.enrollment_id,
+    s.student_name,
+    c.course_name,
+    e.enroll_date,
+    e.payment_status
+FROM Enrollments e
+JOIN Students s ON e.student_id = s.student_id
+JOIN Courses c ON e.course_id = c.course_id
+WHERE e.payment_status = 'Paid';
+
+
+Display student name and course name for enrollments done in November or August:
+SELECT s.student_name, c.course_name
+FROM Enrollments e
+JOIN Students s ON e.student_id = s.student_id
+JOIN Courses c ON e.course_id = c.course_id
+WHERE MONTH(e.enroll_date) IN (11, 8);
+
+
+Show number of courses each student enrolled in, along with min and max fees (only students with >1 course):
+SELECT 
+    s.student_name,
+    COUNT(e.course_id) AS total_courses,
+    MIN(c.fees) AS min_fees,
+    MAX(c.fees) AS max_fees
+FROM Enrollments e
+JOIN Students s ON e.student_id = s.student_id
+JOIN Courses c ON e.course_id = c.course_id
+GROUP BY s.student_name
+HAVING COUNT(e.course_id) > 1;
+
+
+Display all courses where no student has enrolled yet:
+SELECT *
+FROM Courses c
+LEFT JOIN Enrollments e ON c.course_id = e.course_id
+WHERE e.course_id IS NULL;
+
+
+
+
