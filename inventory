@@ -1,0 +1,220 @@
+Employee names and their performance ratings in 3 review cycles are stored in an employees dictionary:
+
+employees = {
+    'Aryan': [82, 76, 90],
+    'Priya': [91, 88, 85],
+    'Nikhil': [55, 63, 58],
+    'Sunita': [70, 74, 68]
+}
+
+Write a menu-driven program to perform the following tasks:
+
+a) Print all employee names along with their ratings.
+
+b) Calculate and print the total ratings and average ratings of each employee.
+
+c) Accept an employee name and a new rating for the 2nd review cycle from the user. If the employee exists, update the 2nd review rating. Otherwise, print "Employee not found".
+
+d) Write a function get_grade which accepts average ratings as a parameter and returns the performance grade:
+
+If average is 80 or above → "Outstanding"
+If average is between 65 and 79 → "Good"
+If average is between 50 and 64 → "Average"
+If average is below 50 → "Poor"
+
+Use this function to display the performance grade of each employee.
+
+e) Save the final employee report in a file named performance_report.txt. Then print the number of lines and number of words present in the file.
+
+Code:
+employees = {
+    'Aryan': [82, 76, 90],
+    'Priya': [91, 88, 85],
+    'Nikhil': [55, 63, 58],
+    'Sunita': [70, 74, 68]
+}
+
+# Function to get grade
+def get_grade(avg):
+    if avg >= 80:
+        return "Outstanding"
+    elif avg >= 65:
+        return "Good"
+    elif avg >= 50:
+        return "Average"
+    else:
+        return "Poor"
+
+while True:
+    print("\n1.Display 2.Total&Avg 3.Update 4.Grade 5.Save 6.Exit")
+    ch = input("Enter choice: ")
+
+    # a) Display
+    if ch == '1':
+        for name, ratings in employees.items():
+            print(name, ratings)
+
+    # b) Total & Average
+    elif ch == '2':
+        for name, ratings in employees.items():
+            total = sum(ratings)
+            avg = total / len(ratings)
+            print(name, "Total:", total, "Average:", avg)
+
+    # c) Update 2nd rating
+    elif ch == '3':
+        name = input("Enter employee name: ")
+        if name in employees:
+            new_rating = int(input("Enter new rating: "))
+            employees[name][1] = new_rating
+            print("Updated")
+        else:
+            print("Employee not found")
+
+    # d) Grade
+    elif ch == '4':
+        for name, ratings in employees.items():
+            avg = sum(ratings) / len(ratings)
+            print(name, get_grade(avg))
+
+    # e) Save to file
+    elif ch == '5':
+        file = open("performance_report.txt", "w")
+        for name, ratings in employees.items():
+            total = sum(ratings)
+            avg = total / len(ratings)
+            grade = get_grade(avg)
+            file.write(f"{name} {ratings} Total={total} Avg={avg} Grade={grade}\n")
+        file.close()
+
+        file = open("performance_report.txt", "r")
+        lines = file.readlines()
+        print("Lines:", len(lines))
+        words = sum(len(line.split()) for line in lines)
+        print("Words:", words)
+
+    elif ch == '6':
+        break
+
+
+
+2. Item names with quantity and price are stored in an inventory dictionary:
+
+inventory = {
+    'Laptop': (10, 45000),
+    'Mouse': (85, 350),
+    'Keyboard': (40, 750),
+    'Monitor': (6, 12000)
+}
+
+In the given tuples:
+
+First value = quantity
+Second value = price per unit
+
+Write a menu-driven program to perform the following tasks:
+
+a) Print all item names along with quantity and price.
+
+b) Calculate and print the stock value of each item using:
+👉 stock_value = quantity × price
+Also print the total stock value of all items.
+
+c) Accept an item name and new quantity from the user. If the item exists, update its quantity. Otherwise, print "Item not found".
+
+d) Write a function get_stock_status which accepts quantity as a parameter and returns:
+
+If quantity is less than 8 → "Critical Stock"
+If quantity is between 8 and 20 → "Low Stock"
+If quantity is between 21 and 50 → "Adequate Stock"
+If quantity is greater than 50 → "High Stock"
+
+Use this function to display the stock status for each item.
+
+e) Save the final inventory report in a file named store_report.txt. Then print the number of lines and number of words present in the file.
+Also use a regular expression to check whether an item name contains only letters and spaces.
+
+inventory = {
+    'Laptop': (10, 45000),
+    'Mouse': (85, 350),
+    'Keyboard': (40, 750),
+    'Monitor': (6, 12000)
+}
+
+import re
+
+# Function for stock status
+def get_stock_status(qty):
+    if qty < 8:
+        return "Critical Stock"
+    elif qty <= 20:
+        return "Low Stock"
+    elif qty <= 50:
+        return "Adequate Stock"
+    else:
+        return "High Stock"
+
+while True:
+    print("\n1.Display 2.Stock Value 3.Update 4.Status 5.Save 6.Exit")
+    ch = input("Enter choice: ")
+
+    # a) Display
+    if ch == '1':
+        for item, (qty, price) in inventory.items():
+            print(item, "Quantity:", qty, "Price:", price)
+
+    # b) Stock value
+    elif ch == '2':
+        total = 0
+        for item, (qty, price) in inventory.items():
+            value = qty * price
+            total += value
+            print(item, "Stock Value:", value)
+        print("Total Stock Value:", total)
+
+    # c) Update quantity
+    elif ch == '3':
+        item = input("Enter item name: ")
+
+        if not re.match("^[A-Za-z ]+$", item):
+            print("Invalid name")
+            continue
+
+        if item in inventory:
+            qty, price = inventory[item]
+            new_qty = int(input("Enter new quantity: "))
+            inventory[item] = (new_qty, price)
+            print("Updated")
+        else:
+            print("Item not found")
+
+    # d) Stock status
+    elif ch == '4':
+        for item, (qty, price) in inventory.items():
+            print(item, get_stock_status(qty))
+
+    # e) Save file
+    elif ch == '5':
+        file = open("store_report.txt", "w")
+        total = 0
+        for item, (qty, price) in inventory.items():
+            value = qty * price
+            total += value
+            file.write(f"{item} Stock Value={value}\n")
+        file.write(f"Total={total}")
+        file.close()
+
+        file = open("store_report.txt", "r")
+        lines = file.readlines()
+        print("Lines:", len(lines))
+        words = sum(len(line.split()) for line in lines)
+        print("Words:", words)
+
+    elif ch == '6':
+        break
+
+
+
+
+
+
