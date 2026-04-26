@@ -1,0 +1,120 @@
+Q1. Write queries for the following database
+
+Create the following tables, populate the data, and write queries for the questions below:
+
+Tables
+1. Staff
+
+Columns:
+
+staff_id (INT) – primary key
+staff_name (VARCHAR(50))
+department (VARCHAR(30))
+2. Medicines
+
+Columns:
+
+medicine_id (INT) – primary key
+medicine_name (VARCHAR(50))
+category (VARCHAR(30))
+price (DECIMAL(10,2))
+3. Prescriptions
+
+Columns:
+
+prescription_id (INT) – primary key
+staff_id (INT) – foreign key references Staff(staff_id)
+medicine_id (INT) – foreign key references Medicines(medicine_id)
+prescribed_date DATE
+status (VARCHAR(20))
+Additional Restrictions:
+price must be greater than 0
+status can contain only 'Dispensed' or 'Pending'
+
+
+code: 
+CREATE TABLE Staff (
+    staff_id INT PRIMARY KEY,
+    staff_name VARCHAR(50),
+    department VARCHAR(30)
+);
+
+CREATE TABLE Medicines (
+    medicine_id INT PRIMARY KEY,
+    medicine_name VARCHAR(50),
+    category VARCHAR(30),
+    price DECIMAL(10,2),
+    CHECK (price > 0)
+);
+
+CREATE TABLE Prescriptions (
+    prescription_id INT PRIMARY KEY,
+    staff_id INT,
+    medicine_id INT,
+    prescribed_date DATE,
+    status VARCHAR(20),
+    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id),
+    FOREIGN KEY (medicine_id) REFERENCES Medicines(medicine_id),
+    CHECK (status IN ('Dispensed', 'Pending'))
+);
+
+INSERT INTO Staff VALUES
+(1, 'Aryan Mehta', 'Cardiology'),
+(2, 'Priya Bose', 'Neurology'),
+(3, 'Nikhil Rao', 'Cardiology'),
+(4, 'Sneha Iyer', 'Orthopedics');
+
+INSERT INTO Medicines VALUES
+(101, 'Paracetamol', 'Painkiller', 50.00),
+(102, 'Aspirin', 'Painkiller', 30.00),
+(103, 'Amoxicillin', 'Antibiotic', 120.00),
+(104, 'Cetirizine', 'Antihistamine', 80.00);
+
+INSERT INTO Prescriptions VALUES
+(1001, 1, 101, '2024-04-01', 'Dispensed'),
+(1002, 2, 103, '2024-04-02', 'Pending'),
+(1003, 1, 102, '2024-04-03', 'Dispensed'),
+(1004, 3, 104, '2024-04-04', 'Pending'),
+(1005, 4, 101, '2024-04-05', 'Dispensed');
+
+SELECT * FROM Staff;
+
+SELECT * FROM Medicines
+WHERE price > 50;
+
+SELECT * FROM Prescriptions
+WHERE status = 'Pending';
+
+SELECT s.staff_name, p.prescription_id, p.status
+FROM Staff s
+JOIN Prescriptions p ON s.staff_id = p.staff_id;
+
+SELECT s.staff_name, m.medicine_name
+FROM Prescriptions p
+JOIN Staff s ON p.staff_id = s.staff_id
+JOIN Medicines m ON p.medicine_id = m.medicine_id;
+
+SELECT staff_id, COUNT(*) AS total_prescriptions
+FROM Prescriptions
+GROUP BY staff_id;
+
+SELECT category, COUNT(*) AS total
+FROM Medicines
+GROUP BY category;
+
+SELECT * FROM Medicines
+ORDER BY price DESC
+LIMIT 1;
+
+SELECT * FROM Staff
+WHERE department = 'Cardiology';
+
+SELECT 
+    p.prescription_id,
+    s.staff_name,
+    m.medicine_name,
+    p.prescribed_date,
+    p.status
+FROM Prescriptions p
+JOIN Staff s ON p.staff_id = s.staff_id
+JOIN Medicines m ON p.medicine_id = m.medicine_id;
